@@ -21,6 +21,7 @@ struct Stack{
 /*
  * makes stack
  * this should be used over making it yourself
+ * size is the size and does not point at anything
  * */
 struct Stack makeStack(){
     struct Stack a ;
@@ -102,7 +103,7 @@ int indexAt(struct Stack *stack,int i){
 
 
 void setAt(struct Stack *stack,int i,int val){
-    (*stack->list)[i]=val;
+    (*stack->list)[i]=val;//does this not work?
 }
 
 
