@@ -6,16 +6,16 @@
 #include <string.h>
 #include "./debug.c"
 
-typedef struct Stack{
+typedef struct VStack{
     void* elements;
     int size;
     int elemSize;
     int capasity;
 
-}Stack;
+}VStack;
 
-Stack makeStack(int elemsize){
-    Stack a;
+VStack makeVStack(int elemsize){
+    VStack a;
     a.capasity=10;
     a.size=0;
     a.elemSize=elemsize;
@@ -26,7 +26,7 @@ Stack makeStack(int elemsize){
 
 
 
-void * pop(Stack *stack){
+void * Vpop(VStack *stack){
 
     if (stack->size>0){
         //what
@@ -42,7 +42,7 @@ void * pop(Stack *stack){
 
 
 
-void _IncreaseStackCap(struct Stack* stack){
+void _IncreaseVStackCap(struct VStack* stack){
 
     stack->capasity*=2;
     //save
@@ -59,12 +59,13 @@ void _IncreaseStackCap(struct Stack* stack){
 
 
 
-void push(Stack* stack,void*elem){
+void Vpush(VStack* stack, void*elem){
 
     if (stack->size == stack->capasity){
         //inclrease stackcap
-        _IncreaseStackCap(stack);
+        _IncreaseVStackCap(stack);
     }
+
     //(*stack->list)[stack->size++]=value;
     //this is an adress not what i want
     
@@ -78,7 +79,7 @@ void push(Stack* stack,void*elem){
 
 
 
-void destroyStack(Stack *stack){
+void destroyVStack(VStack *stack){
     //this probably needs to free all enements not just the one
     free(stack->elements);
 }
@@ -87,8 +88,8 @@ void destroyStack(Stack *stack){
 /*
  * print stack information
  * */
-void printStack(struct Stack stack){
-    printf("stack size:%i, stack cap:%i \n", stack.size, stack.capasity);
+void printVStack(struct VStack stack){
+    printf("Vstack size:%i, stack cap:%i \n", stack.size, stack.capasity);
     for(int i=0 ;i<stack.size;i++){
         printf("index :%i is %i \n", i, *((int*)stack.elements+i) );//shit
     }

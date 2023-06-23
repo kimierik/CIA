@@ -98,9 +98,16 @@ void printStack(struct Stack stack){
 }
 
 int indexAt(struct Stack *stack,int i){
-    return (*stack->list)[i];
+    //printf("attempting to index :%i \n",i);
+    int a= (*stack->list)[i];
+    //printf("retrieved :%i=%c\n",a,a);
+    return a;
 }
 
+//same as index at except does not take ref takes copy
+int indexAtCop(struct Stack stack,int i){
+    return (*stack.list)[i];
+}
 
 void setAt(struct Stack *stack,int i,int val){
     (*stack->list)[i]=val;//does this not work?

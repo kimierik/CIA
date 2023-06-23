@@ -4,7 +4,7 @@
 
 
 void TestVoidStack(){
-    Stack a = makeStack(sizeof(int));
+    VStack a = makeVStack(sizeof(int));
 
     int aa=1;
     int ab=23;
