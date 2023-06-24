@@ -53,7 +53,16 @@ VStack LexString(Lexer*lexer){
 
     while(lexer->pos < lexer->string.size){
         //printf("lexing...\n");
+        if(indexAt(&lexer->string,lexer->pos)==0){
+            printf("would lex 0\n");
+            break;
+        }else{
+            printf("sending %c, %i to next token\n",indexAt(&lexer->string,lexer->pos),indexAt(&lexer->string,lexer->pos));
+        }
         Token*a=NextToken(lexer) ;
+        if (!a){
+            break;
+        }
         //printf("token done... %i\n", a->type);
         
         Vpush(&stack,a);
@@ -66,12 +75,20 @@ VStack LexString(Lexer*lexer){
 
 
 
-//gives the next token 
+/*
+ * gets next token. returns null at file, otherwize crashes
+ * */
 Token* NextToken(Lexer*lexer){
 //what is at position
     char c= indexAt(&lexer->string, lexer->pos);
-    //printf("lexing char  %c\n",c);
+    printf("lexing char  %c\n",c);
 
+    //skip whitespace
+    //we need to skip before this fn other wize we will get unknowh unless we do retunr null ptr
+    while (c==' ' || c=='\n' || c== '\t' ||c=='\r'){
+        c= indexAt(&lexer->string, ++lexer->pos);
+    }
+    
 
     //make token from it
     switch (c) {
@@ -116,7 +133,10 @@ Token* NextToken(Lexer*lexer){
         case '/':
             lexer->pos++;
             return makeTokenL(Operator,c);
-            
+
+        case 0:
+            return NULL;
+
 
         default:
             break;
@@ -132,7 +152,12 @@ Token* NextToken(Lexer*lexer){
     }  
 
 
-    if (isNumber(c)) {  }  
+    while (isNumber(c)){  
+        //needs malloc
+        char*literal=getLiteral(lexer);
+        return makeToken(IntLiteral, literal);
+
+    }
     
     //string literal 
     if (c=='"'){
@@ -144,14 +169,16 @@ Token* NextToken(Lexer*lexer){
     if (c==39){}
 
 
-    printf("error making token from: %c\n" ,c);
+    printf("error making token from: %c ,%i\n" ,c,c);
     PrintStackTrace();
     exit(2);
     //else crash
 }
 
 
-//returns literal untill whitespace or " so we can use it ad id or sthing
+/*
+ * returns literal untill whitespace or " so we can use it ad id or string or int literal
+ * */
 char* getLiteral(Lexer*lexer){
 
     char c= indexAt(&lexer->string,lexer->pos);
@@ -167,7 +194,7 @@ char* getLiteral(Lexer*lexer){
 
     //this never runs into these characters?
     //printf("whil\n");
-    while (c!='"' && c!=' ' && c!='\n' && c!='\t' && c!='\r' && c!='(' ){
+    while (c!='"' && c!=' ' && c!='\n' && c!='\t' && c!='\r' && c!='(' &&c !=')' && c != ',' ){
         //printf("char is %c \n",c);
         push(&a,c);
         c=indexAt(&lexer->string, ++lexer->pos);

@@ -1,5 +1,8 @@
 #include "./ulits/datastructures.c"
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 #include "./instructions.c"
 #include "./cpu.c"
 #include "compiler/lexer.c"
@@ -11,28 +14,29 @@
 int main(){ 
     //make some code give to machine and run 
     //see if workka
-    printf("running main\n");
+    //printf("running main\n");
 
-    /*
-    int code[7]= 
-    {
-        ICONST,99,
-        ICONST,2, 
-        IADD, 
-        PRINT_INT,
-        HALT       
-    };
-     * */
-    //something that uses array thing. idkman
-    //there sp should be at 5
 
     struct Stack st=makeStack();
-    push(&st,'a');
-    push(&st,'s');
-    push(&st,'d');
-    push(&st,'f');
-    push(&st,'(');
-    push(&st,')');
+
+    char* filename="./examples/test.bar";
+
+    FILE *fptr; 
+    fptr=fopen(filename,"r");
+
+    if (!fptr){
+       printf("unable to open file %s: %s \n ", filename,strerror(errno));
+       exit(2);
+    }
+    char buffer[2];
+   
+    while(fgets(buffer,2,fptr)){ 
+        //incase we get null char
+        if(buffer[0]==0){
+            break;
+        }
+        push(&st,buffer[0]);
+    }
 
 
     Lexer l =MakeLexer(st);
@@ -42,7 +46,7 @@ int main(){
 
     printf("Vstack size:%i, stack cap:%i \n", thing.size, thing.capasity);
     for(int i=0 ;i<thing.size;i++){
-        printf("index :%i is %s \n", i, ((Token*)thing.elements+i)->value );//shit
+        printf("index :%i is %s, type: %i \n", i, ((Token*)thing.elements+i)->value, ((Token*)thing.elements+i)->type);
     }
 
 
