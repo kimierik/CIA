@@ -43,5 +43,8 @@ typedef struct Lexer{
 
 }Lexer;
 
+char* stringifyToken(TokenType tokentype);
+
+void CleanToken(Token*token);
 
 #endif

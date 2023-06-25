@@ -120,8 +120,8 @@ void setAt(struct Stack *stack,int i,int val){
 /*
  * deallocate everything that the stack has allocated
  * */
-void removeStack(struct Stack stack){
-    free(stack.list);
+void removeStack(struct Stack *stack){
+    free(stack->list);
 }
 
 

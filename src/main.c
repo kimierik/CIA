@@ -6,20 +6,12 @@
 #include "./instructions.c"
 #include "./cpu.c"
 #include "compiler/lexer.c"
+#include "compiler/lexer.h"
 //
 
 
 
-
-int main(){ 
-    //make some code give to machine and run 
-    //see if workka
-    //printf("running main\n");
-
-
-    struct Stack st=makeStack();
-
-    char* filename="./examples/test.bar";
+void loadFileIntoString(struct Stack*string, char* filename){
 
     FILE *fptr; 
     fptr=fopen(filename,"r");
@@ -35,18 +27,35 @@ int main(){
         if(buffer[0]==0){
             break;
         }
-        push(&st,buffer[0]);
+        push(string,buffer[0]);
     }
+}
+
+
+
+
+
+int main(){ 
+
+    //tokens stack
+    struct Stack st=makeStack();
+
+    char* filename="./examples/test.bar";
+
+    loadFileIntoString(&st, filename);
+
 
 
     Lexer l =MakeLexer(st);
 
+    //tokenlist stack
     VStack thing= LexString(&l);//fails here
 
 
     printf("Vstack size:%i, stack cap:%i \n", thing.size, thing.capasity);
     for(int i=0 ;i<thing.size;i++){
-        printf("index :%i is %s, type: %i \n", i, ((Token*)thing.elements+i)->value, ((Token*)thing.elements+i)->type);
+        Token** tok=((Token**)thing.elements+i);
+        printf("index :%i type %s, has value: %s \n", i,  stringifyToken( (*tok)->type),(*tok)->value);
     }
 
 
@@ -70,8 +79,6 @@ int main(){
         PRINT_CH,
         PRINT_CH,
         PRINT_CH,
-
-
     };
 
     struct Cpu cpu=makeCpu();
@@ -82,10 +89,14 @@ int main(){
 
     runAllInstructions(&cpu,0);
     
-
-    
     
 
+    //deallocate everything
+    //im not actually sure if this properly deallocates everything
+    destroyPointerVstack(&thing,&CleanToken);
+    printf("removed pstack\n");
+    removeStack(&st);
+    
     return 0;
 }
 

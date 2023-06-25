@@ -45,7 +45,8 @@ Lexer MakeLexer(struct Stack string){
 
 VStack LexString(Lexer*lexer){
 
-    VStack stack=makeVStack(sizeof(Token));
+    //TODO fix this we are not storing tokens we are storing token pointers
+    VStack stack=makeVStack(sizeof(Token*));
     
     //mallof space for token
     //place token there
@@ -57,7 +58,7 @@ VStack LexString(Lexer*lexer){
             printf("would lex 0\n");
             break;
         }else{
-            printf("sending %c, %i to next token\n",indexAt(&lexer->string,lexer->pos),indexAt(&lexer->string,lexer->pos));
+            //printf("sending %c, %i to next token\n",indexAt(&lexer->string,lexer->pos),indexAt(&lexer->string,lexer->pos));
         }
         Token*a=NextToken(lexer) ;
         if (!a){
@@ -65,7 +66,7 @@ VStack LexString(Lexer*lexer){
         }
         //printf("token done... %i\n", a->type);
         
-        Vpush(&stack,a);
+        Vpush(&stack,&a);
     }
 
 
@@ -81,7 +82,7 @@ VStack LexString(Lexer*lexer){
 Token* NextToken(Lexer*lexer){
 //what is at position
     char c= indexAt(&lexer->string, lexer->pos);
-    printf("lexing char  %c\n",c);
+    //printf("lexing char  %c\n",c);
 
     //skip whitespace
     //we need to skip before this fn other wize we will get unknowh unless we do retunr null ptr
@@ -117,6 +118,10 @@ Token* NextToken(Lexer*lexer){
         case ';':
             lexer->pos++;
             return makeToken(Semicolon,NULL);
+        case ',':
+            lexer->pos++;
+            return makeToken(Comma,NULL);
+
         case '=':
             lexer->pos++;
             return makeToken(Equals,NULL);
@@ -205,6 +210,8 @@ char* getLiteral(Lexer*lexer){
     //stack has the thing sting now
     char* ret =malloc(sizeof(char) * a.size+ sizeof(char) ); //+1 for null termination
 
+    //does this leam mem?
+    //arent we just reallocating something here
     for (int i=0; i<a.size;i++){
         ret[i]=indexAt(&a,i);
     }
@@ -213,6 +220,7 @@ char* getLiteral(Lexer*lexer){
     //printf("attemping to set nullterminatior\n");
     ret[a.size]='\0';
 
+    //printf("allocced string %s at  %p",ret,ret);
 
     //printf("%s\n",ret);
 
@@ -237,6 +245,7 @@ int isNumber(char c){
 
 
 Token* makeToken(TokenType type, char* val){
+    //printf("makes with val %s at %p\n",val,val);
     Token * a= malloc(sizeof(Token));
     a->type=type;
     a->value=val;
@@ -253,12 +262,26 @@ Token* makeTokenL(TokenType type, char val){
 
 
 
+//both of these variables are on the stack value/ and the token itself
+//token should not be 
+//but the value is  we make it as [] and return it so its somewhere on stack?
+//idk about token that should most definetly be on the heap since we malloc it in makeToken
 void CleanToken(Token*token){
+    //printf("CleanToken fn %p\n",token);
     if(token && token->value){
+        //printf("freeing value %s at %p\n", token->value, token->value);
+        //what can you not free this char array?? 
+        ////is it not on the heap?
+        ///well we dont malloc it anywhere so i assume its not on the heap to be freed
+        ///wait we do malloc it
         free(token->value);
     }
 
     if (token){
+        //printf("token itself\n");
+        //
+        //whell this might be invalid since parameters are stack variables xd
+        //wait  how is this a stack variable? this is allocated in the heap
         free(token);
     }
     token=NULL;
@@ -268,10 +291,56 @@ void CleanToken(Token*token){
 
 void CleanLexer(Lexer *lexer){
     
-    removeStack(lexer->string);
+    removeStack(&lexer->string);
     lexer=NULL;
 }
 
+
+
+char* stringifyToken(TokenType tokentype){
+    switch (tokentype){
+        case Identifier:
+            return "Identifier";
+
+        case Lparen:
+            return "Lparen";
+        case Rparen:
+            return "Rparen";
+
+        case Lsquirly:
+            return "Lsquirly";
+        case Rsquirly:
+            return "Rsquirly";
+
+        case DoubleQuote:
+            return "DoubleQuote";
+        case SingleQuote:
+            return "SingleQuote";
+
+
+        case IntLiteral:
+            return "IntLiteral";
+        case StringLiteral:
+            return "StringLiteral";
+        case CharLiteral:
+            return "CharLiteral";
+
+        case Semicolon:
+            return "Semicolon";
+
+        case Comma:
+            return "Comma";
+        case Equals:
+            return "Equals";
+        case Operator:
+            return "Operator";
+
+        default:
+            return "Un Printable Token";
+
+    }
+
+}
 
 
 #endif

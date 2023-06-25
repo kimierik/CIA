@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "./debug.c"
+#include "../compiler/lexer.h"
 
 typedef struct VStack{
     void* elements;
@@ -66,22 +67,37 @@ void Vpush(VStack* stack, void*elem){
         _IncreaseVStackCap(stack);
     }
 
-    //(*stack->list)[stack->size++]=value;
-    //this is an adress not what i want
-    
-    //printf("adding elem %i\n", *(int*)elem );
-    //printf("adress of elem %d\n", elem );
-
     //copy elem to elements + pos*elemsize
-    //this is pointer to element not pointer to pointer of elem
-    memcpy(stack->elements + stack->size++ *stack->elemSize, elem, stack->elemSize);
+    //copy whatever is at the pointer elem to the list
+    memcpy(stack->elements + stack->size*stack->elemSize , elem, stack->elemSize);
+    stack->size++;
 }
 
 
 
 void destroyVStack(VStack *stack){
+    //ughhh
+    //probably make a function that loops all elems and applies a function that is passed to them
     //this probably needs to free all enements not just the one
     free(stack->elements);
+}
+
+/*
+ * used when pointers are stored on the stack
+ * this function deallocates the pointers and the pointer array
+ * 
+ * */
+void destroyPointerVstack(VStack *stack, void(*ElementCleaningFunction)(void *) ){
+//    printf("\ndestrpying stack, size: %i\n",stack->size);
+
+    for(int i=stack->size-1 ;i>=0;i--){
+        void** tok=((void**)(stack->elements+(i*stack->elemSize)));
+
+        (*ElementCleaningFunction)(*tok);
+        //printf("freed Tok \n\n");
+    }
+
+    destroyVStack(stack);
 }
 
 
@@ -89,9 +105,11 @@ void destroyVStack(VStack *stack){
  * print stack information
  * */
 void printVStack(struct VStack stack){
-    printf("Vstack size:%i, stack cap:%i \n", stack.size, stack.capasity);
+    printf("printingstack\n");
+    printf("Vstack size:%i, stack cap:%i, elemsize:%i \n", stack.size, stack.capasity, stack.elemSize);
     for(int i=0 ;i<stack.size;i++){
-        printf("index :%i is %i \n", i, *((int*)stack.elements+i) );//shit
+        int*p=((int*)(stack.elements+(i*stack.elemSize)));
+        printf("index :%i is %i \n", i,*p );//shit
     }
 }
 
