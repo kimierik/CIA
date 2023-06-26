@@ -28,8 +28,7 @@ char* getLiteral(Lexer*lexer);
 
 
 
-/* -------------------------------------------------- FUNCTIONS -------------------------------------------------- 
- * */
+/* -------------------------------------------------- FUNCTIONS -------------------------------------------------- */
 
 
 
@@ -223,6 +222,7 @@ char* getLiteral(Lexer*lexer){
     //printf("allocced string %s at  %p",ret,ret);
 
     //printf("%s\n",ret);
+    removeStack(&a);
 
     return ret;
 
