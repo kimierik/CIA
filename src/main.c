@@ -92,8 +92,7 @@ int main(){
     
 
     //deallocate everything
-    //im not actually sure if this properly deallocates everything
-    destroyPointerVstack(&thing,&CleanToken);
+    destroyPointerVstack(&thing,(void(*)(void*)) &CleanToken);
     printf("removed pstack\n");
     removeStack(&st);
     
